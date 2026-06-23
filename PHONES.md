@@ -5,9 +5,7 @@ follow the steps for **your** kind of phone.
 
 The link to the app is:
 
-> **https://YOURNAME.github.io/shower-schedule/**
->
-> _(Replace this line with the real link before sending.)_
+> **https://megzieberr.github.io/shower-schedule/**
 
 ---
 
