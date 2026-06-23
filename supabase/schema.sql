@@ -47,14 +47,38 @@ declare
   v_others int;
   v_before int;
   v_after  int;
+  v_now    timestamp;
+  v_today  date;
+  v_hour   int;
+  v_existing int;
 begin
   if p_slot < 17 or p_slot > 23 then
     raise exception 'INVALID_SLOT';
   end if;
 
+  -- Current South African date and hour (used to block past times).
+  v_now   := now() at time zone 'Africa/Johannesburg';
+  v_today := v_now::date;
+  v_hour  := extract(hour from v_now)::int;
+
+  -- You cannot book a time that has already passed.
+  if p_date < v_today or (p_date = v_today and p_slot < v_hour) then
+    raise exception 'SLOT_PAST';
+  end if;
+
   -- Handle one day at a time so two people booking at the same instant
   -- cannot both slip past the geyser rule.
   perform pg_advisory_xact_lock(hashtext(p_date::text));
+
+  -- You cannot change a booking whose time has already passed today.
+  if p_date = v_today then
+    select slot into v_existing
+      from public.bookings
+      where person_id = p_person_id and date = p_date;
+    if found and v_existing < v_hour then
+      raise exception 'ALREADY_PASSED';
+    end if;
+  end if;
 
   -- Booking a new slot also moves you: drop your existing booking for the day.
   delete from public.bookings where person_id = p_person_id and date = p_date;
@@ -87,8 +111,28 @@ language plpgsql
 security definer
 set search_path = public
 as $$
+declare
+  v_now    timestamp;
+  v_today  date;
+  v_hour   int;
+  v_existing int;
 begin
   perform pg_advisory_xact_lock(hashtext(p_date::text));
+
+  v_now   := now() at time zone 'Africa/Johannesburg';
+  v_today := v_now::date;
+  v_hour  := extract(hour from v_now)::int;
+
+  -- You cannot cancel a shower whose time has already passed today.
+  if p_date = v_today then
+    select slot into v_existing
+      from public.bookings
+      where person_id = p_person_id and date = p_date;
+    if found and v_existing < v_hour then
+      raise exception 'ALREADY_PASSED';
+    end if;
+  end if;
+
   delete from public.bookings where person_id = p_person_id and date = p_date;
 end;
 $$;

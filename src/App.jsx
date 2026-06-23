@@ -14,6 +14,9 @@ function friendlyError(msg = '') {
   if (msg.includes('SLOT_FULL')) return 'That time just filled up — please pick another.'
   if (msg.includes('GEYSER_RULE'))
     return 'The geyser needs time to recover around that hour. Try a slot with a gap before or after a busy time.'
+  if (msg.includes('SLOT_PAST')) return 'That time has already passed — please pick a later time.'
+  if (msg.includes('ALREADY_PASSED'))
+    return 'Your shower time has already passed, so it can no longer be changed.'
   if (msg.includes('INVALID_SLOT')) return 'That is not a valid shower time.'
   return 'Something went wrong. Please check your internet and try again.'
 }
@@ -25,6 +28,7 @@ export default function App() {
   const [bookings, setBookings] = useState([])
   const [error, setError] = useState('')
   const [showSettings, setShowSettings] = useState(false)
+  const [, setNowTick] = useState(0)
 
   // Pull all bookings for the four visible days, with each person's name.
   const fetchBookings = useCallback(async () => {
@@ -72,6 +76,18 @@ export default function App() {
       document.removeEventListener('visibilitychange', onFocus)
     }
   }, [fetchBookings])
+
+  // Tick every minute so a slot greys out on its own the moment its hour
+  // passes, and the visible days roll over at midnight.
+  useEffect(() => {
+    const id = setInterval(() => {
+      const ds = visibleDates()
+      setDates((prev) => (prev[0] === ds[0] ? prev : ds))
+      setActiveDate((cur) => (ds.includes(cur) ? cur : ds[0]))
+      setNowTick((n) => n + 1)
+    }, 60000)
+    return () => clearInterval(id)
+  }, [])
 
   async function book(date, slot) {
     if (!person) return

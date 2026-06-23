@@ -16,6 +16,17 @@ export function saToday() {
   }).format(new Date())
 }
 
+// Returns the current hour in SA as a number from 0 to 23.
+export function saHour() {
+  return Number(
+    new Intl.DateTimeFormat('en-GB', {
+      timeZone: TZ,
+      hour: '2-digit',
+      hour12: false,
+    }).format(new Date()),
+  )
+}
+
 // Adds n calendar days to a 'YYYY-MM-DD' string and returns a new 'YYYY-MM-DD'.
 // We do the maths in UTC so it never shifts a day because of a time zone.
 export function addDays(dateStr, n) {

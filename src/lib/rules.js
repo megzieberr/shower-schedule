@@ -22,11 +22,13 @@ export function groupBySlot(bookings) {
 //   'geyser'   - 1 person, but a neighbour is full so it cannot reach 2
 //   'one-left' - 1 person and a 2nd is still allowed
 //   'open'     - empty
-export function slotState(slot, bySlot, myId) {
+export function slotState(slot, bySlot, myId, isPast = false) {
   const here = bySlot[slot] || []
   const count = here.length
   const mine = here.some((b) => b.person_id === myId)
 
+  // A slot whose hour has already passed today is locked.
+  if (isPast) return mine ? 'mine-past' : 'past'
   if (mine) return 'mine'
   if (count >= 2) return 'full'
 

@@ -34,7 +34,9 @@ Seven slots a day: **17:00–23:00**.
    slot with just 1 person "resets" the chain.
 3. **One shower per person per day.** Booking a new slot moves you off your old one.
 4. **Rolling window:** today + the next 3 days are visible; past days disappear.
-5. A person can book or change any time during a visible day.
+5. A person can book or change any time during a visible day — **but once a
+   slot's hour has passed today, it locks** (you can't book it, move into it, or
+   cancel it). Enforced server-side too.
 
 These rules are enforced **server-side** in the `set_booking` Postgres function,
 so they cannot be bypassed from the browser.

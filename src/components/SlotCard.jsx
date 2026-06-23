@@ -7,6 +7,8 @@ const CARD_STYLE = {
   full: 'bg-slate-100 border-slate-200',
   geyser: 'bg-slate-100 border-slate-200',
   mine: 'bg-sky-50 border-sky-500 ring-2 ring-sky-200',
+  past: 'bg-slate-100 border-slate-200 opacity-60',
+  'mine-past': 'bg-sky-50 border-sky-200 opacity-70',
 }
 
 const STATE_LABEL = {
@@ -15,6 +17,8 @@ const STATE_LABEL = {
   full: 'Full',
   geyser: 'Geyser recovering',
   mine: 'Your shower ✓',
+  past: 'Passed',
+  'mine-past': 'Done ✓',
 }
 
 const STATE_LABEL_STYLE = {
@@ -23,6 +27,8 @@ const STATE_LABEL_STYLE = {
   full: 'text-slate-400',
   geyser: 'text-slate-400',
   mine: 'text-sky-700',
+  past: 'text-slate-400',
+  'mine-past': 'text-slate-500',
 }
 
 export default function SlotCard({ slot, state, people, iHaveASlot, onBook, onCancel }) {
