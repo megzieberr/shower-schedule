@@ -2,6 +2,11 @@
 --  Shower Schedule — database setup
 --  Run in: Supabase dashboard -> SQL Editor -> New query -> paste -> Run
 --  Safe to run more than once.
+--
+--  ⚠ AFTER running this, also run migration-2-family-key.sql (in this same
+--  folder). It replaces the open policies below with a family-code gate so
+--  strangers cannot read the family's names or push keys. This file keeps
+--  the original open policies only so a fresh install works step by step.
 -- ============================================================
 
 -- 1. TABLES ---------------------------------------------------

@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
-import { supabase } from './lib/supabase.js'
+import { supabase, hasFamilyKey, FAMILY_KEY_STORAGE } from './lib/supabase.js'
 import { isConfigured } from './lib/config.js'
 import { loadPerson } from './lib/identity.js'
 import { visibleDates } from './lib/time.js'
 import AddMe from './components/AddMe.jsx'
+import FamilyGate from './components/FamilyGate.jsx'
 import Header from './components/Header.jsx'
 import DateTabs from './components/DateTabs.jsx'
 import DayView from './components/DayView.jsx'
@@ -11,6 +12,8 @@ import SettingsSheet from './components/SettingsSheet.jsx'
 import NotConfigured from './components/NotConfigured.jsx'
 
 function friendlyError(msg = '') {
+  if (msg.includes('FAMILY_KEY'))
+    return 'The family code on this device is out of date — re-enter it to continue.'
   if (msg.includes('SLOT_FULL')) return 'That time just filled up — please pick another.'
   if (msg.includes('GEYSER_RULE'))
     return 'The geyser needs time to recover around that hour. Try a slot with a gap before or after a busy time.'
@@ -89,6 +92,17 @@ export default function App() {
     return () => clearInterval(id)
   }, [])
 
+  // If the stored family code stops working (Megan changed it), clear it and
+  // send this device back to the code screen instead of erroring forever.
+  function handleRpcError(err) {
+    if (err.message?.includes('FAMILY_KEY')) {
+      localStorage.removeItem(FAMILY_KEY_STORAGE)
+      window.location.reload()
+      return
+    }
+    setError(friendlyError(err.message))
+  }
+
   async function book(date, slot) {
     if (!person) return
     setError('')
@@ -97,7 +111,7 @@ export default function App() {
       p_date: date,
       p_slot: slot,
     })
-    if (err) setError(friendlyError(err.message))
+    if (err) handleRpcError(err)
     fetchBookings()
   }
 
@@ -108,11 +122,13 @@ export default function App() {
       p_person_id: person.id,
       p_date: date,
     })
-    if (err) setError(friendlyError(err.message))
+    if (err) handleRpcError(err)
     fetchBookings()
   }
 
   if (!isConfigured) return <NotConfigured />
+
+  if (!hasFamilyKey()) return <FamilyGate />
 
   if (!person) {
     return <AddMe onAdded={(p) => setPerson(p)} />
