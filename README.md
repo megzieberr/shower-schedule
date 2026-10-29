@@ -1,3 +1,9 @@
+# RETIRED 29 Oct 2026 (her call)
+
+GitHub Pages OFF, repo ARCHIVED, Supabase project `Shower Schedule (shower-timesup account)` PAUSED 29 Oct 2026 (restorable for about 90 days, then gone; nothing in it worth saving, her call). Local folder moved to `Desktop\Claude Code Projects\_archive\`. The skeleton = this repo + `supabase/`. Do not wake it unless Megan un-retires it.
+
+---
+
 # Shower Schedule 🚿
 
 A tiny installable web app (PWA) that lets a 5-person household share one geyser
